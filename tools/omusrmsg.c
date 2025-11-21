@@ -294,6 +294,14 @@ static rsRetVal wallmsg(uchar *pMsg, instanceData *pData) {
         char **sessions_list;
         int sessions = sd_get_sessions(&sessions_list);
 
+        if (sessions < 0) {
+            /* sd_get_sessions failed, log error and fall back to utmp */
+            uchar szErr[512];
+            rs_strerror_r(-sessions, (char *)szErr, sizeof(szErr));
+            LogError(0, NO_ERRCODE, "sd_get_sessions failed with [%d]:%s, falling back to utmp\n", -sessions, szErr);
+            goto use_utmp;
+        }
+
         for (j = 0; j < sessions; j++) {
             uchar szErr[512];
             char *tty;
@@ -355,9 +363,10 @@ static rsRetVal wallmsg(uchar *pMsg, instanceData *pData) {
             free(sessions_list[j]);
         }
         free(sessions_list);
+        return iRet;
     } else {
 #endif
-
+    use_utmp:
         /* open the user login file */
         setutent();
 
