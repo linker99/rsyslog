@@ -253,6 +253,15 @@ local0.* ./'${RSYSLOG_DYNNAME}'.HOSTNAME;hostname
 	echo HOSTNAME is: $RS_HOSTNAME
 }
 
+# Like setvar_RS_HOSTNAME, but normalizes hostname to lowercase.
+# This is needed for UDP tests because imudp performs DNS resolution
+# which lowercases hostnames per RFC 1035.
+setvar_RS_HOSTNAME_lc() {
+	setvar_RS_HOSTNAME
+	export RS_HOSTNAME="$(echo $RS_HOSTNAME | tr '[:upper:]' '[:lower:]')"
+	echo HOSTNAME normalized to lowercase: $RS_HOSTNAME
+}
+
 
 # begin a new testconfig
 #	2018-09-07:	Incremented inputs.timeout.shutdown to 60000 because kafka tests may not be

@@ -1,7 +1,7 @@
 #!/bin/bash
 # add 2018-06-27 by Pascal Withopf, released under ASL 2.0
 . ${srcdir:=.}/diag.sh init
-setvar_RS_HOSTNAME
+setvar_RS_HOSTNAME_lc
 generate_conf
 add_conf '
 module(load="../plugins/imudp/.libs/imudp")
