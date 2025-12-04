@@ -191,35 +191,32 @@ static int mygetnameinfo(
 
 /* get only the local part of the hostname and set it in cache entry */
 static void setLocalHostName(dnscache_entry_t *etry) {
-    uchar *fqdnLower;
+    uchar *fqdnStr;
     uchar *p;
     int i;
     uchar hostbuf[NI_MAXHOST];
 
     if (glbl.GetPreserveFQDN()) {
-        prop.AddRef(etry->fqdnLowerCase);
-        etry->localName = etry->fqdnLowerCase;
+        prop.AddRef(etry->fqdn);
+        etry->localName = etry->fqdn;
         goto done;
     }
 
     /* strip domain, if configured for this entry */
-    fqdnLower = propGetSzStr(etry->fqdnLowerCase);
-    p = (uchar *)strchr((char *)fqdnLower, '.'); /* find start of domain name "machine.example.com" */
+    fqdnStr = propGetSzStr(etry->fqdn);
+    p = (uchar *)strchr((char *)fqdnStr, '.'); /* find start of domain name "machine.example.com" */
     if (p == NULL) { /* do we have a domain part? */
-        prop.AddRef(etry->fqdnLowerCase); /* no! */
-        etry->localName = etry->fqdnLowerCase;
+        prop.AddRef(etry->fqdn); /* no! */
+        etry->localName = etry->fqdn;
         goto done;
     }
 
-    i = p - fqdnLower; /* length of hostname */
-    memcpy(hostbuf, fqdnLower, i);
+    i = p - fqdnStr; /* length of hostname */
+    memcpy(hostbuf, fqdnStr, i);
     hostbuf[i] = '\0';
 
-    /* at this point, we have not found anything, so we again use the
-     * already-created complete full name property.
-     */
-    prop.AddRef(etry->fqdnLowerCase);
-    etry->localName = etry->fqdnLowerCase;
+    /* create property with just the hostname part (preserving case) */
+    prop.CreateStringProp(&etry->localName, hostbuf, i);
 done:
     return;
 }
