@@ -248,9 +248,18 @@ local0.* ./'${RSYSLOG_DYNNAME}'.HOSTNAME;hostname
 	tcpflood -m1 -M "\"<128>\""
 	shutdown_when_empty
 	wait_shutdown ""
-	export RS_HOSTNAME="$(cat ${RSYSLOG_DYNNAME}.HOSTNAME | tr '[:upper:]' '[:lower:]')"
+	export RS_HOSTNAME="$(cat ${RSYSLOG_DYNNAME}.HOSTNAME)"
 	rm -f "${RSYSLOG_DYNNAME}.HOSTNAME"
 	echo HOSTNAME is: $RS_HOSTNAME
+}
+
+# Like setvar_RS_HOSTNAME, but normalizes hostname to lowercase.
+# This is needed for UDP tests because imudp performs DNS resolution
+# which lowercases hostnames per RFC 1035.
+setvar_RS_HOSTNAME_lc() {
+	setvar_RS_HOSTNAME
+	export RS_HOSTNAME="$(echo $RS_HOSTNAME | tr '[:upper:]' '[:lower:]')"
+	echo HOSTNAME normalized to lowercase: $RS_HOSTNAME
 }
 
 
