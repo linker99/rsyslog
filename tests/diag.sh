@@ -248,7 +248,7 @@ local0.* ./'${RSYSLOG_DYNNAME}'.HOSTNAME;hostname
 	tcpflood -m1 -M "\"<128>\""
 	shutdown_when_empty
 	wait_shutdown ""
-	export RS_HOSTNAME="$(cat ${RSYSLOG_DYNNAME}.HOSTNAME)"
+	export RS_HOSTNAME="$(cat ${RSYSLOG_DYNNAME}.HOSTNAME | tr '[:upper:]' '[:lower:]')"
 	rm -f "${RSYSLOG_DYNNAME}.HOSTNAME"
 	echo HOSTNAME is: $RS_HOSTNAME
 }
